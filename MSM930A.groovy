@@ -57,25 +57,12 @@ public class MSM930A extends MSOHook{
         String Action = screen.nextAction
         String activeStat = ""
         MsoField errField = new MsoField()
-        String hostname;
-        InetAddress ip;
-        ip = InetAddress.getLocalHost();
-        hostname = ip.getHostName();
-
-//      mendefinisikan variable "postUrl" yang akan menampung url tujuan integrasi ke API Maximo
-        def postUrl
-        if (hostname.contains("ellprd"))
-        {
-            postUrl = "http://maximo-production.ptpjb.com:9080/meaweb/es/EXTSYS1/MXE-GLCOMP-XML"
-        }
-        else if (hostname.contains("elltst"))
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-GLCOMP-XML"
-        }
-        else
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-GLCOMP-XML"
-        }
+        String hostname
+        InetAddress ip
+        ip = InetAddress.getLocalHost()
+        hostname = ip.getHostName()
+        String hostUrl = getHostUrl(hostname)
+        String postUrl = "$hostUrl/meaweb/es/EXTSYS1/MXE-GLCOMP-XML"
 
         AccountDesc = StringEscapeUtils.escapeXml(AccountDesc)
 
