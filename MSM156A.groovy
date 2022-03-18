@@ -703,23 +703,10 @@ class MSM156A extends MSOHook{
         InetAddress ip
         ip = InetAddress.getLocalHost()
         String hostname = ip.getHostName()
+        String hostUrl = getHostUrl(hostname)
+        String postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
 
         log.info("Arsiadi integrateActualCost MSM156A Version: $hookVersion")
-
-        def postUrl
-        if (hostname.contains("ellprd"))
-        {
-            postUrl = "http://maximo-production.ptpjb.com:9080/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
-        }
-        else if (hostname.contains("elltst"))
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
-        }
-        else
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
-        }
-
         log.info("FKeys: ${screen.getField("FKEYS1I").getValue()}")
         log.info("NextAction: ${screen.nextAction}")
 
@@ -1055,7 +1042,6 @@ class MSM156A extends MSOHook{
                 }
             }
         }
-
         return null
     }
 

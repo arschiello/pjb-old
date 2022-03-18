@@ -176,21 +176,10 @@ class MSM170B extends MSOHook{
 
 //      membaca url Ellipse yang sedang aktif dan assign ke variable "hostname" dengan tipe String
             String hostname = ip.getHostName()
+            String hostUrl = getHostUrl(hostname)
 
 //      mendefinisikan variable "postUrl" yang akan menampung url tujuan integrasi ke API Maximo
-            String postUrl = ""
-            if (hostname.contains("ellprd"))
-            {
-                postUrl = "http://maximo-production.ptpjb.com:9080/meaweb/es/EXTSYS1/MXE-ITEM-XML"
-            }
-            else if (hostname.contains("elltrn"))
-            {
-                postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ITEM-XML"
-            }
-            else
-            {
-                postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ITEM-XML"
-            }
+            String postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-ITEM-XML"
             log.info("postUrl: $postUrl")
 
 // proses berikut menjelaskan urutan pengiriman data ke API Maximo

@@ -32,35 +32,6 @@ import com.mincom.ellipse.types.m1000.instances.ScriptName
 class GenericScriptService_execute extends ServiceHook{
 
 	String hookVersion = "1"
-
-	String getHostUrl(String hostName){
-		String result
-		String instance
-
-		InitialContext initialContext = new InitialContext()
-		Object dataSource = initialContext.lookup("java:jboss/datasources/ReadOnlyDatasource")
-		Sql sql = new Sql(dataSource)
-
-
-		if (hostName.contains("ellprd")){
-			instance = "ellprd"
-		}
-		else if (hostName.contains("elltrn")){
-			instance = "elltrn"
-		}
-		else if (hostName.contains("elltst")){
-			instance = "elltst"
-		}
-		else {
-			instance = "elldev"
-		}
-
-		String queryMSF010 = "select table_desc as tableDesc from msf010 where table_type = '+MAX' and table_code = '$instance'"
-		Object queryMSF010Result = sql.firstRow(queryMSF010)
-		result = queryMSF010Result ? queryMSF010Result.tableDesc ? queryMSF010Result.tableDesc.trim(): "" : ""
-
-		return result
-	}
 	
 	InitialContext initial = new InitialContext()
 	Object CAISource = initial.lookup("java:jboss/datasources/ApplicationDatasource")

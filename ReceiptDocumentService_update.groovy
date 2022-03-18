@@ -17,26 +17,15 @@ class ReceiptDocumentService_update extends ServiceHook{
 
     InetAddress ip = InetAddress.getLocalHost()
     String hostname = ip.getHostName()
-    def postUrl
+    String hostUrl = getHostUrl(hostname)
+// mendefinisikan variable "postUrl" yang akan menampung url tujuan integrasi ke API Maximo
+    String postUrl
 
     @Override
     Object onPostExecute(Object request, Object results){
         log.info("Arsiadi Hooks ReceiptDocumentService_update onPostExecute version: $hookVersion")
-
         BigDecimal receiptVal = 0
-
-        if (hostname.contains("ellprd"))
-        {
-            postUrl = "http://maximo-production.ptpjb.com:9080/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
-        }
-        else if (hostname.contains("elltst"))
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
-        }
-        else
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
-        }
+        postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
 
         ReceiptDocumentServiceResult res = (ReceiptDocumentServiceResult)results
         ReceiptDocumentDTO inp = (ReceiptDocumentDTO)request
@@ -67,302 +56,6 @@ class ReceiptDocumentService_update extends ServiceHook{
         log.info("ARSIADI request receiptPurchaseOrderItemDTO2: $receiptPurchaseOrderItemDTO2")
         log.info("ARSIADI response receiptPurchaseOrderItemDTOs: $receiptPurchaseOrderItemDTOs")
 
-        if (receiptPurchaseOrderItemDTOs){
-//            log.info("receipt multi item PO")
-//            log.info("receiptPurchaseOrderItemDTOs size: ${receiptPurchaseOrderItemDTOs.size()}")
-//
-//            getReceiptValue(receiptPurchaseOrderItemDTOs, districtCode)
-//
-//            receiptPurchaseOrderItemDTOs.eachWithIndex{ ReceiptPurchaseOrderItemDTO entry, int i ->
-//                BigDecimal qtyReceipt = entry.getReceiptQuantity().getValue()
-//                String poNumber = entry.getDocumentNumber().getValue()
-//                String poItemNo = entry.getDocumentItem().getValue()
-//
-//                log.info("districtCode: $districtCode")
-//                log.info("qtyReceipt: $qtyReceipt")
-//                log.info("poNumber: $poNumber")
-//                log.info("poItemNo: $poItemNo")
-//
-//                String queryPoItem = "SELECT CURR_NET_PR_P as currNetPrP, PO_ITEM_TYPE as poItemType FROM MSF221 WHERE DSTRCT_CODE = '$districtCode' " +
-//                        "AND PO_NO = '$poNumber' AND PO_ITEM_NO = '$poItemNo'"
-//                log.info("queryPoItem $i: $queryPoItem")
-//
-//                def queryPoPrice = sql.firstRow(queryPoItem)
-//
-//                if (queryPoPrice){
-//                    BigDecimal currNetPrP = queryPoPrice.currNetPrP as BigDecimal
-//                    BigDecimal addVal = currNetPrP * qtyReceipt
-//                    log.info("currNetPrP: $currNetPrP")
-//                    log.info("receiptVal Before: $addVal")
-//                    receiptVal += addVal
-//                    log.info("receiptVal after: $addVal")
-//
-//                    String poItemType = queryPoPrice.poItemType as String
-//                    log.info("poItemType: $poItemType")
-//                    if (poItemType.trim() != "O" && poItemType != "F"){
-//                        String queryMSF221 = "SELECT distinct substr(preq_stk_code, 1, 6) as REQ_NO" +
-//                                "             FROM MSF221 WHERE PO_NO = '$poNo' AND dstrct_code = '$districtCode' AND PO_ITEM_NO = $poItemNo"
-//
-//                        log.info("queryMSF221: $queryMSF221")
-//                        def queryMSF221Result = sql.firstRow(queryMSF221)
-//                        log.info("queryMSF221Result: $queryMSF221Result")
-//
-//                        if (queryMSF221Result){
-//                            String reqNo = queryMSF221Result.REQ_NO as String
-//
-//                            log.info("districtCode: $districtCode")
-//                            log.info("reqNo: $reqNo")
-//
-//                            String queryMSF232 = "select distinct work_order as WORK_ORDER from msf232 " +
-//                                    "where dstrct_code = '$districtCode' "+
-//                                    "and substr(requisition_no, 1, 6) like '${reqNo}%'"
-//                            log.info("queryMSF232: $queryMSF232")
-//
-//                            def queryWO = sql.firstRow(queryMSF232)
-//                            log.info("queryWO: $queryWO")
-//
-//                            if (queryWO){
-//                                String wo = queryWO.WORK_ORDER as String
-//                                log.info("wo: $wo")
-//
-//                                if (wo.trim() == "") {
-//                                    return null
-//                                } else {
-//                                    String queryProcessWO = "select distinct work_order as WORK_ORDER from msf232 " +
-//                                            "where dstrct_code = '$districtCode' " +
-//                                            "and substr(requisition_no, 1, 6) like '${reqNo}%'"
-//                                    log.info("queryProcessWO: $queryProcessWO")
-//
-//                                    sql.eachRow(queryProcessWO) {row2 ->
-//                                        String workOrder = row2.WORK_ORDER as String
-//
-//                                        def queryIreqItem = sql.firstRow("WITH MAT AS(\n" +
-//                                                "SELECT DSTRCT_CODE\n" +
-//                                                "      ,WORK_ORDER\n" +
-//                                                "      ,SUM(TRAN_AMOUNT) MAT_COST\n" +
-//                                                "FROM MSF900\n" +
-//                                                "WHERE WORK_ORDER <> ' '\n" +
-//                                                "AND (REC900_TYPE = 'S' OR (REC900_TYPE = 'P' AND SERV_ITM_IND = ' '))\n" +
-//                                                "GROUP BY DSTRCT_CODE\n" +
-//                                                "        ,WORK_ORDER),\n" +
-//                                                "SER AS(\n" +
-//                                                "SELECT DSTRCT_CODE, WORK_ORDER, SUM(TRAN_AMOUNT) SERV_COST\n" +
-//                                                "FROM MSF900\n" +
-//                                                "WHERE WORK_ORDER <> ' '\n" +
-//                                                "AND DSTRCT_CODE = '$districtCode'\n" +
-//                                                "AND REC900_TYPE = 'P'\n" +
-//                                                "AND serv_itm_ind = 'S'\n" +
-//                                                "GROUP BY DSTRCT_CODE, WORK_ORDER)\n" +
-//                                                "SELECT A.DSTRCT_CODE\n" +
-//                                                "      ,A.WORK_ORDER\n" +
-//                                                "      ,CASE WHEN B.MAT_COST IS NOT NULL THEN B.MAT_COST ELSE 0 END MAT_COST\n" +
-//                                                "      ,CASE WHEN C.SERV_COST IS NOT NULL THEN C.SERV_COST ELSE 0 END SERV_COST\n" +
-//                                                "      ,(CASE WHEN B.MAT_COST IS NOT NULL THEN B.MAT_COST ELSE 0 END) + (CASE WHEN C.SERV_COST IS NOT NULL THEN C.SERV_COST ELSE 0 END) TOTAL_COST\n" +
-//                                                "FROM MSF620 A\n" +
-//                                                "LEFT OUTER JOIN MAT B ON A.DSTRCT_CODE = B.DSTRCT_CODE AND A.WORK_ORDER = B.WORK_ORDER\n" +
-//                                                "LEFT OUTER JOIN SER C ON A.DSTRCT_CODE = C.DSTRCT_CODE AND A.WORK_ORDER = C.WORK_ORDER\n" +
-//                                                "WHERE A.DSTRCT_CODE = '$districtCode'\n" +
-//                                                "AND A.WORK_ORDER = '$workOrder'")
-//                                        log.info("queryIreqItem: $queryIreqItem")
-//
-//                                        BigDecimal materialCost = 0
-//                                        BigDecimal totCost = 0
-//
-//                                        BigDecimal matCost = 0
-//                                        BigDecimal servCost = 0
-//                                        BigDecimal totalCost = 0
-//
-//                                        if (queryIreqItem){
-//                                            materialCost = queryIreqItem.MAT_COST as BigDecimal
-//                                            totCost = queryIreqItem.TOTAL_COST as BigDecimal
-//
-//                                            matCost = materialCost + receiptVal
-//                                            servCost = queryIreqItem.SERV_COST as BigDecimal
-//                                            totalCost = totCost + receiptVal
-//                                        }
-//                                        log.info("materialCost: $materialCost")
-//                                        log.info("totCost: $totCost")
-//
-//                                        log.info("matCost: $matCost")
-//                                        log.info("servCost: $servCost")
-//                                        log.info("totalCost: $totalCost")
-//
-//                                        String xmlMessage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-//                                                "<SyncMXE-ACTCOST-XML xmlns=\"http://www.ibm.com/maximo\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" creationDateTime=\"2021-04-15T11:37:06+07:00\" baseLanguage=\"EN\" transLanguage=\"EN\" event=\"0\" maximoVersion=\"7620190514-1348V7611-365\">\n" +
-//                                                "  <MXE-ACTCOST-XMLSet>\n" +
-//                                                "    <WORKORDER>\n" +
-//                                                "      <WONUM>$workOrder</WONUM>\n" +
-//                                                "      <TOTALCOSTELLIPSE>$totalCost</TOTALCOSTELLIPSE>\n" +
-//                                                "      <MATCOSTELLIPSE>$matCost</MATCOSTELLIPSE>\n" +
-//                                                "      <SERVCOSTELLIPSE>$servCost</SERVCOSTELLIPSE>\n" +
-//                                                "      <ORGID>UBPL</ORGID>\n" +
-//                                                "      <SITEID>$districtFormatted</SITEID>\n" +
-//                                                "    </WORKORDER>\n" +
-//                                                "  </MXE-ACTCOST-XMLSet>\n" +
-//                                                "</SyncMXE-ACTCOST-XML>"
-//
-//                                        log.info("ARS --- XML: $xmlMessage")
-//
-//                                        def url = new URL(postUrl)
-//                                        HttpURLConnection connection = url.openConnection()
-//                                        connection.setRequestMethod("POST")
-//                                        connection.setDoOutput(true)
-//                                        connection.setRequestProperty("Content-Type", "application/xml")
-//                                        connection.setRequestProperty("maxauth", "bXhpbnRhZG06bXhpbnRhZG0=")
-//                                        connection.getOutputStream().write(xmlMessage.getBytes("UTF-8"))
-//                                        log.info("responsecode: ${connection.getResponseCode()}")
-//
-//                                        if (connection.getResponseCode() != 200) {
-//                                            String responseMessage = connection.content.toString()
-//                                            log.info("responseMessage: $responseMessage")
-//                                            String errorCode = "9999"
-//
-//                                            throw new EnterpriseServiceOperationException(
-//                                                    new ErrorMessageDTO(
-//                                                            errorCode, responseMessage, "", 0, 0))
-//                                            return request
-//                                        }
-//                                    }
-//                                }
-//                            } else {
-//                                return null
-//                            }
-//                        }
-//
-//                        sql.eachRow("SELECT distinct substr(preq_stk_code, 1, 6) as REQ_NO " +
-//                                " FROM MSF221 WHERE PO_NO = '$poNo' AND dstrct_code = '$districtCode' AND PO_ITEM_TYPE NOT IN ('O','F')") {
-//                        }
-//                    }
-//                }
-//            }
-        }
-        else {
-//            log.info("ARSIADI receiptPurchaseOrderItemDTOs is null, processing single item for PO")
-//
-//            log.info("queryMSF221: SELECT distinct substr(preq_stk_code, 1, 6)\n" +
-//                    "              FROM MSF221 WHERE PO_NO = '$poNo' AND dstrct_code = '$districtCode' AND PO_ITEM_TYPE NOT IN ('O','F')")
-//
-//            log.info("update work order actual cost from non-inventory PO (Goods and Service) ")
-//
-//            sql.eachRow("SELECT distinct substr(preq_stk_code, 1, 6) as REQ_NO\n" +
-//                    "              FROM MSF221 WHERE PO_NO = '$poNo' AND dstrct_code = '$districtCode' AND PO_ITEM_TYPE NOT IN ('O','F')") {row ->
-//                String reqNo = row.REQ_NO as String
-//
-//                log.info("districtCode: $districtCode")
-//                log.info("reqNo: $reqNo")
-//
-//                log.info("select distinct work_order as WORK_ORDER from msf232\n" +
-//                        "                    where dstrct_code = '$districtCode' \n"+
-//                        "                    and substr(requisition_no, 1, 6) like '${reqNo}%'")
-//
-//                def queryWO = sql.firstRow("select distinct work_order as WORK_ORDER from msf232\n" +
-//                        "where dstrct_code = '$districtCode' \n" +
-//                        "and substr(requisition_no, 1, 6) like '${reqNo}%'")
-//                log.info("queryWO: $queryWO")
-//
-//                if (queryWO){
-//                    String wo = queryWO.WORK_ORDER as String
-//                    if (wo.trim() == "")
-//                        return null
-//                } else {
-//                    return null
-//                }
-//
-//                sql.eachRow("select distinct work_order as WORK_ORDER from msf232\n" +
-//                        "where dstrct_code = '$districtCode' \n" +
-//                        "and substr(requisition_no, 1, 6) like '${reqNo}%'") {row2 ->
-//                    String workOrder = row2.WORK_ORDER as String
-//
-//                    def queryIreqItem = sql.firstRow("WITH MAT AS(\n" +
-//                            "SELECT DSTRCT_CODE\n" +
-//                            "      ,WORK_ORDER\n" +
-//                            "      ,SUM(TRAN_AMOUNT) MAT_COST\n" +
-//                            "FROM MSF900\n" +
-//                            "WHERE WORK_ORDER <> ' '\n" +
-//                            "AND (REC900_TYPE = 'S' OR (REC900_TYPE = 'P' AND SERV_ITM_IND = ' '))\n" +
-//                            "GROUP BY DSTRCT_CODE\n" +
-//                            "        ,WORK_ORDER),\n" +
-//                            "SER AS(\n" +
-//                            "SELECT DSTRCT_CODE, WORK_ORDER, SUM(TRAN_AMOUNT) SERV_COST\n" +
-//                            "FROM MSF900\n" +
-//                            "WHERE WORK_ORDER <> ' '\n" +
-//                            "AND DSTRCT_CODE = '$districtCode'\n" +
-//                            "AND REC900_TYPE = 'P'\n" +
-//                            "AND serv_itm_ind = 'S'\n" +
-//                            "GROUP BY DSTRCT_CODE, WORK_ORDER)\n" +
-//                            "SELECT A.DSTRCT_CODE\n" +
-//                            "      ,A.WORK_ORDER\n" +
-//                            "      ,CASE WHEN B.MAT_COST IS NOT NULL THEN B.MAT_COST ELSE 0 END MAT_COST\n" +
-//                            "      ,CASE WHEN C.SERV_COST IS NOT NULL THEN C.SERV_COST ELSE 0 END SERV_COST\n" +
-//                            "      ,(CASE WHEN B.MAT_COST IS NOT NULL THEN B.MAT_COST ELSE 0 END) + (CASE WHEN C.SERV_COST IS NOT NULL THEN C.SERV_COST ELSE 0 END) TOTAL_COST\n" +
-//                            "FROM MSF620 A\n" +
-//                            "LEFT OUTER JOIN MAT B ON A.DSTRCT_CODE = B.DSTRCT_CODE AND A.WORK_ORDER = B.WORK_ORDER\n" +
-//                            "LEFT OUTER JOIN SER C ON A.DSTRCT_CODE = C.DSTRCT_CODE AND A.WORK_ORDER = C.WORK_ORDER\n" +
-//                            "WHERE A.DSTRCT_CODE = '$districtCode'\n" +
-//                            "AND A.WORK_ORDER = '$workOrder'")
-//                    log.info("queryIreqItem: $queryIreqItem")
-//
-//                    BigDecimal materialCost = 0
-//                    BigDecimal totCost = 0
-//
-//                    BigDecimal matCost = 0
-//                    BigDecimal servCost = 0
-//                    BigDecimal totalCost = 0
-//
-//                    if (queryIreqItem){
-//                        materialCost = queryIreqItem.MAT_COST as BigDecimal
-//                        totCost = queryIreqItem.TOTAL_COST as BigDecimal
-//
-//                        matCost = materialCost + receiptVal
-//                        servCost = queryIreqItem.SERV_COST as BigDecimal
-//                        totalCost = totCost + receiptVal
-//                    }
-//                    log.info("materialCost: $materialCost")
-//                    log.info("totCost: $totCost")
-//
-//                    log.info("matCost: $matCost")
-//                    log.info("servCost: $servCost")
-//                    log.info("totalCost: $totalCost")
-//
-//                    String xmlMessage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-//                            "<SyncMXE-ACTCOST-XML xmlns=\"http://www.ibm.com/maximo\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" creationDateTime=\"2021-04-15T11:37:06+07:00\" baseLanguage=\"EN\" transLanguage=\"EN\" event=\"0\" maximoVersion=\"7620190514-1348V7611-365\">\n" +
-//                            "  <MXE-ACTCOST-XMLSet>\n" +
-//                            "    <WORKORDER>\n" +
-//                            "      <WONUM>$workOrder</WONUM>\n" +
-//                            "      <TOTALCOSTELLIPSE>$totalCost</TOTALCOSTELLIPSE>\n" +
-//                            "      <MATCOSTELLIPSE>$matCost</MATCOSTELLIPSE>\n" +
-//                            "      <SERVCOSTELLIPSE>$servCost</SERVCOSTELLIPSE>\n" +
-//                            "      <ORGID>UBPL</ORGID>\n" +
-//                            "      <SITEID>$districtFormatted</SITEID>\n" +
-//                            "    </WORKORDER>\n" +
-//                            "  </MXE-ACTCOST-XMLSet>\n" +
-//                            "</SyncMXE-ACTCOST-XML>"
-//
-//                    log.info("ARS --- XML: $xmlMessage")
-//
-//                    def url = new URL(postUrl)
-//                    HttpURLConnection connection = url.openConnection()
-//                    connection.setRequestMethod("POST")
-//                    connection.setDoOutput(true)
-//                    connection.setRequestProperty("Content-Type", "application/xml")
-//                    connection.setRequestProperty("maxauth", "bXhpbnRhZG06bXhpbnRhZG0=")
-//                    connection.getOutputStream().write(xmlMessage.getBytes("UTF-8"))
-//                    log.info("responsecode: ${connection.getResponseCode()}")
-//
-//                    if (connection.getResponseCode() != 200) {
-//                        String responseMessage = connection.content.toString()
-//                        log.info("responseMessage: $responseMessage")
-//                        String errorCode = "9999"
-//
-//                        throw new EnterpriseServiceOperationException(
-//                                new ErrorMessageDTO(
-//                                        errorCode, responseMessage, "", 0, 0))
-//                        return request
-//                    }
-//                }
-//            }
-        }
-
 // Periksa apakah ada item non-inventory dari PO yang diterima
         String queryPONonStock = "SELECT * \nFROM MSF221 \nWHERE DSTRCT_CODE = '$districtCode' \nAND PO_NO = '$poNo' \nAND PO_ITEM_TYPE IN ('P', 'S')"
         log.info("--- queryPONonStock: \n$queryPONonStock")
@@ -383,13 +76,6 @@ class ReceiptDocumentService_update extends ServiceHook{
 
         def resultQueryPOStock = sql.firstRow(queryPOStock)
         log.info("---resultQueryPOStock: $resultQueryPOStock")
-
-// jika ada, update biaya SOH dari stock code yang dimaksud
-//        if (resultQueryPOStock){
-//            sql.eachRow(queryPOStock){Object it ->
-//                updateSOH(it)
-//            }
-//        }
     }
 
     def updateSOH(Object resultQueryPOStock){
@@ -405,12 +91,6 @@ class ReceiptDocumentService_update extends ServiceHook{
             String unitOfMeasure = resultQueryPOStock.UNIT_OF_PURCH ? resultQueryPOStock.UNIT_OF_PURCH.trim() : ""
             String inventCategory = resultQueryPOStock.INVENT_CAT ? resultQueryPOStock.INVENT_CAT.trim(): ""
             String warehouseId = resultQueryPOStock.WHOUSE_ID ? resultQueryPOStock.WHOUSE_ID.trim(): ""
-
-            log.info("Arsiadi WarehouseID: $warehouseId")
-            log.info("Arsiadi qtyReceipt: $qtyReceipt")
-            log.info("Arsiadi unitOfMeasure: $unitOfMeasure")
-            log.info("Arsiadi inventCategory: $inventCategory")
-            log.info("Arsiadi WarehouseID: $warehouseId")
 
             String queryMSF100 = "SELECT ITEM_NAME, STK_DESC FROM MSF100 WHERE STOCK_CODE = '${stockCode.trim()}'"
             def queryMSF100Result = sql.firstRow(queryMSF100)
@@ -437,26 +117,7 @@ class ReceiptDocumentService_update extends ServiceHook{
                         districtCode.trim() == "SGRK" ? "GR" : "PLNUPJB"
             }
 
-            if (hostname.contains("ellprd"))
-            {
-                postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ITEM-XML"
-            }
-            else if (hostname.contains("elltst"))
-            {
-                postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ITEM-XML"
-            }
-            else
-            {
-                postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ITEM-XML"
-            }
-
-            log.info("district formatted: $districtFormatted")
-            log.info("stockCode: $stockCode")
-            log.info("stockDesc: $stockDesc")
-            log.info("warehouseId: $warehouseId")
-            log.info("inventCategory: $inventCategory")
-            log.info("qtyReceipt: $qtyReceipt")
-            log.info("unitOfMeasure: $unitOfMeasure")
+            postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-ITEM-XML"
 
             String queryCommand = "with b as (\n" +
                     "select b.DSTRCT_CODE,a.STOCK_CODE,sum(a.SOH) SOH\n" +

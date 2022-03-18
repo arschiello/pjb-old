@@ -511,20 +511,10 @@ class PickTaskService_issue extends ServiceHook{
 		InetAddress ip
 		ip = InetAddress.getLocalHost()
 		String hostname = ip.getHostName()
+		String hostUrl = getHostUrl(hostname)
 
-		def postUrl
-		if (hostname.contains("ellprd"))
-		{
-			postUrl = "http://maximo-production.ptpjb.com:9080/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
-		}
-		else if (hostname.contains("elltst"))
-		{
-			postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
-		}
-		else
-		{
-			postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
-		}
+//      mendefinisikan variable "postUrl" yang akan menampung url tujuan integrasi ke API Maximo
+		String postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
 
 		PickTaskIssueServiceResult responseDto = (PickTaskIssueServiceResult) result
 //		PickTaskIssueDTO[] requestDto = (PickTaskIssueDTO[]) input
@@ -673,20 +663,10 @@ class PickTaskService_issue extends ServiceHook{
 		InetAddress ip
 		ip = InetAddress.getLocalHost()
 		String hostname = ip.getHostName()
+		String hostUrl = getHostUrl(hostname)
 
-		def postUrl
-		if (hostname.contains("ellprd"))
-		{
-			postUrl = "http://maximo-production.ptpjb.com:9080/meaweb/es/EXTSYS1/MXE-ACTMAT-XML"
-		}
-		else if (hostname.contains("elltst"))
-		{
-			postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ACTMAT-XML"
-		}
-		else
-		{
-			postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ACTMAT-XML"
-		}
+//      mendefinisikan variable "postUrl" yang akan menampung url tujuan integrasi ke API Maximo
+		String postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-ACTMAT-XML"
 
 		PickTaskIssueServiceResult responseDto = (PickTaskIssueServiceResult) result
 		PickTaskIssueDTO[] requestDto = (PickTaskIssueDTO[]) input
@@ -842,20 +822,10 @@ class PickTaskService_issue extends ServiceHook{
 		InetAddress ip
 		ip = InetAddress.getLocalHost()
 		String hostname = ip.getHostName()
+		String hostUrl = getHostUrl(hostname)
 
-		def postUrl
-		if (hostname.contains("ellprd"))
-		{
-			postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ITEM-XML"
-		}
-		else if (hostname.contains("elltst"))
-		{
-			postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ITEM-XML"
-		}
-		else
-		{
-			postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ITEM-XML"
-		}
+//      mendefinisikan variable "postUrl" yang akan menampung url tujuan integrasi ke API Maximo
+		String postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-ITEM-XML"
 
 		PickTaskIssueServiceResult responseDto = (PickTaskIssueServiceResult) result
 		PickTaskIssueDTO[] requestDto = (PickTaskIssueDTO[]) input

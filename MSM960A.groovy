@@ -78,7 +78,7 @@ class MSM960A extends MSOHook{
         String hostUrl = getHostUrl(hostname)
 
 //      mendefinisikan variable "postUrl" yang akan menampung url tujuan integrasi ke API Maximo
-        String postUrl = "$hostUrl/meaweb/es/EXTSYS1/MXE-COA-XML"
+        String postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-COA-XML"
 
 //        if (hostname.contains("ellprd"))
 //        {

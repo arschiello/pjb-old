@@ -75,10 +75,6 @@ class PurchaseOrderReceiptService_cancel extends ServiceHook{
 
                 purchaseOrderReceiptServiceResult.setPurchaseOrderReceiptDTO(purchaseOrderReceiptDTO)
             }
-//            log.info("---orderNumber2: ${purchaseOrderReceiptServiceResult.getPurchaseOrderReceiptDTO()}")
-//            log.info("---orderItemNumber2: ${purchaseOrderReceiptDTO.purchaseOrderItemNumber.getValue()}")
-//            log.info("---receiptRef2: ${purchaseOrderReceiptDTO.receiptReference.getValue()}")
-//            log.info("---receiptRefCancel2: ${purchaseOrderReceiptDTO.receiptReferenceCancel.getValue()}")
             log.info("---changeNumber2: ${purchaseOrderReceiptServiceResult.getPurchaseOrderReceiptDTO().changeNumber.getValue()}")
         }
         return null

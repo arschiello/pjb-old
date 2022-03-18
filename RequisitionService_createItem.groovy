@@ -1085,20 +1085,8 @@ class RequisitionService_createItem extends  ServiceHook{
                 InetAddress ip
                 ip = InetAddress.getLocalHost()
                 String hostname = ip.getHostName()
-
-                def postUrl
-                if (hostname.contains("ellprd"))
-                {
-                    postUrl = "http://maximo-production.ptpjb.com:9080/meaweb/es/EXTSYS1/MXE-PRL-XML"
-                }
-                else if (hostname.contains("elltst"))
-                {
-                    postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-PRL-XML"
-                }
-                else
-                {
-                    postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-PRL-XML"
-                }
+                String hostUrl = getHostUrl(hostname)
+                String postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-PRL-XML"
                 log.info("postUrl: $postUrl")
 
                 def url = new URL(postUrl)

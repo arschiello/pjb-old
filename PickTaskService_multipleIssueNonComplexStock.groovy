@@ -487,20 +487,10 @@ class PickTaskService_multipleIssueNonComplexStock extends ServiceHook{
         InetAddress ip
         ip = InetAddress.getLocalHost()
         String hostname = ip.getHostName()
+        String hostUrl = getHostUrl(hostname)
 
-        def postUrl
-        if (hostname.contains("ellprd"))
-        {
-            postUrl = "http://maximo-production.ptpjb.com:9080/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
-        }
-        else if (hostname.contains("elltst"))
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
-        }
-        else
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
-        }
+//      mendefinisikan variable "postUrl" yang akan menampung url tujuan integrasi ke API Maximo
+        String postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
 
         PickTaskIssueServiceResult[] responseDto = (PickTaskIssueServiceResult[]) result
         log.info("responseDTO size: ${responseDto.size()}")
@@ -542,34 +532,6 @@ class PickTaskService_multipleIssueNonComplexStock extends ServiceHook{
             workOrder = workOrder.trim() != "" ? workOrder.trim() : ""
             log.info("workOrder: $workOrder")
             if (workOrder != ""){
-//                String qryIreqItem = "WITH MAT AS(SELECT DSTRCT_CODE\n" +
-//                        "                  ,WORK_ORDER\n" +
-//                        "                  ,SUM(TRAN_AMOUNT) MAT_COST\n" +
-//                        "            FROM MSF900 WHERE WORK_ORDER = '$workOrder'\n" +
-//                        "            AND (REC900_TYPE = 'S' OR (REC900_TYPE = 'P' AND SERV_ITM_IND = ' '))\n" +
-//                        "            AND DSTRCT_CODE = '$districtNo'\n" +
-//                        "            GROUP BY DSTRCT_CODE\n" +
-//                        "                    ,WORK_ORDER), \n" +
-//                        "     SER AS(SELECT DSTRCT_CODE\n" +
-//                        "                 ,WORK_ORDER\n" +
-//                        "                 ,SUM(TRAN_AMOUNT) SERV_COST \n" +
-//                        "            FROM MSF900\n" +
-//                        "            WHERE WORK_ORDER = '$workOrder'\n" +
-//                        "            AND DSTRCT_CODE = '$districtNo'\n" +
-//                        "            AND REC900_TYPE = 'P'\n" +
-//                        "            AND serv_itm_ind = 'S'\n" +
-//                        "            GROUP BY DSTRCT_CODE\n" +
-//                        "                    ,WORK_ORDER)\n" +
-//                        "SELECT A.DSTRCT_CODE\n" +
-//                        "      ,A.WORK_ORDER\n" +
-//                        "      ,CASE WHEN B.MAT_COST IS NOT NULL THEN B.MAT_COST ELSE 0 END MAT_COST\n" +
-//                        "      ,CASE WHEN C.SERV_COST IS NOT NULl THEN C.SERV_COST ELSE 0 END SERV_COST\n" +
-//                        "      ,(CASE WHEN B.MAT_COST IS NOT NULL THEN B.MAT_COST ELSE 0 END) + (CASE WHEN C.SERV_COST IS NOT NULL THEN C.SERV_COST ELSE 0 END) TOTAL_COST\n" +
-//                        "FROM MSF620 A\n" +
-//                        "LEFT OUTER JOIN MAT B ON A.DSTRCT_CODE = B.DSTRCT_CODE AND A.WORK_ORDER = B.WORK_ORDER \n" +
-//                        "LEFT OUTER JOIN SER C ON A.DSTRCT_CODE = C.DSTRCT_CODE AND A.WORK_ORDER = C.WORK_ORDER \n" +
-//                        "WHERE A.DSTRCT_CODE = '$districtNo' \n" +
-//                        "AND A.WORK_ORDER = '$workOrder'"
                 String qryIreqItem = "WITH WOCOST AS (SELECT A.DSTRCT_CODE\n" +
                         "      ,A.WORK_ORDER\n" +
                         "      ,SUM(CASE WHEN A.DSTRCT_CODE = '$districtNo' AND (A.REC900_TYPE = 'S' OR (A.REC900_TYPE = 'P' AND B.SERV_ITM_IND = ' ')) THEN B.TRAN_AMOUNT ELSE 0 END) MAT_COST\n" +
@@ -654,20 +616,10 @@ class PickTaskService_multipleIssueNonComplexStock extends ServiceHook{
         InetAddress ip
         ip = InetAddress.getLocalHost()
         String hostname = ip.getHostName()
+        String hostUrl = getHostUrl(hostname)
 
-        def postUrl
-        if (hostname.contains("ellprd"))
-        {
-            postUrl = "http://maximo-production.ptpjb.com:9080/meaweb/es/EXTSYS1/MXE-ACTMAT-XML"
-        }
-        else if (hostname.contains("elltst"))
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ACTMAT-XML"
-        }
-        else
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ACTMAT-XML"
-        }
+//      mendefinisikan variable "postUrl" yang akan menampung url tujuan integrasi ke API Maximo
+        String postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-ACTMAT-XML"
 
         PickTaskIssueServiceResult[] responseDto = (PickTaskIssueServiceResult[]) result
 
@@ -844,20 +796,10 @@ class PickTaskService_multipleIssueNonComplexStock extends ServiceHook{
         InetAddress ip
         ip = InetAddress.getLocalHost()
         String hostname = ip.getHostName()
+        String hostUrl = getHostUrl(hostname)
 
-        def postUrl
-        if (hostname.contains("ellprd"))
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ITEM-XML"
-        }
-        else if (hostname.contains("elltst"))
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ITEM-XML"
-        }
-        else
-        {
-            postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-ITEM-XML"
-        }
+//      mendefinisikan variable "postUrl" yang akan menampung url tujuan integrasi ke API Maximo
+        String postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-ITEM-XML"
 
         PickTaskIssueServiceResult[] responseDto = (PickTaskIssueServiceResult[]) result
 

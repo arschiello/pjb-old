@@ -67,7 +67,7 @@ public class MSM920A extends MSOHook{
         ip = InetAddress.getLocalHost()
         hostname = ip.getHostName()
         String hostUrl = getHostUrl(hostname)
-        String postUrl = "$hostUrl/meaweb/es/EXTSYS1/MXE-GLCOMP-XML"
+        String postUrl = "{$hostUrl}/meaweb/es/EXTSYS1/MXE-GLCOMP-XML"
 
         AccountDesc = StringEscapeUtils.escapeXml(AccountDesc)
         log.info("Active Status: ${screen.getField("ACTIVE_STATUS1I").getValue()}")
