@@ -971,16 +971,16 @@ class PickTaskService_issue extends ServiceHook{
 
 
 		if (hostName.contains("ellprd")){
-			instance = "ellprd"
+			instance = "ELLPRD"
 		}
 		else if (hostName.contains("elltrn")){
-			instance = "elltrn"
+			instance = "ELLTRN"
 		}
 		else if (hostName.contains("elltst")){
-			instance = "elltst"
+			instance = "ELLTST"
 		}
 		else {
-			instance = "elldev"
+			instance = "ELLDEV"
 		}
 
 		String queryMSF010 = "select table_desc as tableDesc from msf010 where table_type = '+MAX' and table_code = '$instance'"
