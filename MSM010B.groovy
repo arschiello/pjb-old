@@ -28,16 +28,16 @@ class MSM010B extends MSOHook{
 
 
         if (hostName.contains("ellprd")){
-            instance = "ellprd"
+            instance = "ELLPRD"
         }
         else if (hostName.contains("elltrn")){
-            instance = "elltrn"
+            instance = "ELLTRN"
         }
         else if (hostName.contains("elltst")){
-            instance = "elltst"
+            instance = "ELLTST"
         }
         else {
-            instance = "elldev"
+            instance = "ELLDEV"
         }
 
         String queryMSF010 = "select table_desc as tableDesc from msf010 where table_type = '+MAX' and table_code = '$instance'"
@@ -65,9 +65,10 @@ class MSM010B extends MSOHook{
 
 // membaca url Ellipse yang sedang aktif dan assign ke variable "hostname" dengan tipe String
         String hostname = ip.getHostName()
+        String hostUrl = getHostUrl(hostname)
 
 // mendefinisikan variable "postUrl" yang akan menampung url tujuan integrasi ke API Maximo
-        def postUrl
+        String postUrl
         log.info("FKeys: ${request.getField("FKEYS2I").getValue()}")
 
 // definisi variable dengan membaca nilai user yang dimasukkan di layar MSM010B untuk dikirimkan ke Maximo
@@ -101,19 +102,7 @@ class MSM010B extends MSOHook{
 // mendefinisikan pesan dalam format XML (sebagai String) untuk dikirimkan ke API Maximo
             String xmlMessage = ""
             if (tableType == 'JABR'){
-                if (hostname.contains("ellprd"))
-                {
-                    postUrl = "http://maximo-production.ptpjb.com:9080/meaweb/es/EXTSYS1/MXE-GLSUB-XML"
-                }
-                else if (hostname.contains("elltst"))
-                {
-                    postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-GLSUB-XML"
-                }
-                else
-                {
-                    postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-GLSUB-XML"
-                }
-
+                postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-GLSUB-XML"
                 if (actionFlag == "D"){
                     xmlMessage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                             "<SyncMXE-GLSUB-XML xmlns=\"http://www.ibm.com/maximo\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" creationDateTime=\"2021-04-15T12:30:30+07:00\" baseLanguage=\"EN\" transLanguage=\"EN\" event=\"0\" maximoVersion=\"7620190514-1348V7611-365\">\n" +
@@ -142,19 +131,7 @@ class MSM010B extends MSOHook{
                 }
             }
             else {
-                if (hostname.contains("ellprd"))
-                {
-                    postUrl = "http://maximo-production.ptpjb.com:9080/meaweb/es/EXTSYS1/MXE-UOM-XML"
-                }
-                else if (hostname.contains("elltst"))
-                {
-                    postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-UOM-XML"
-                }
-                else
-                {
-                    postUrl = "http://maximo-training.ptpjb.com:9082/meaweb/es/EXTSYS1/MXE-UOM-XML"
-                }
-
+                postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-UOM-XML"
                 if (actionFlag == "D"){
                     xmlMessage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                             "<SyncMXE-UOM-XML xmlns=\"http://www.ibm.com/maximo\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" creationDateTime=\"2021-04-15T11:21:02+07:00\" baseLanguage=\"EN\" transLanguage=\"EN\" event=\"0\" maximoVersion=\"7620190514-1348V7611-365\">\n" +
@@ -181,8 +158,6 @@ class MSM010B extends MSOHook{
                             "    </MXE-UOM-XMLSet>\n" +
                             "</SyncMXE-UOM-XML>"
                 }
-
-
             }
 
             log.info("ARS postUrl: $postUrl")

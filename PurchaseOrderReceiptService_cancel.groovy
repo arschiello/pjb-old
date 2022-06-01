@@ -20,18 +20,17 @@ class PurchaseOrderReceiptService_cancel extends ServiceHook{
         Object dataSource = initialContext.lookup("java:jboss/datasources/ReadOnlyDatasource")
         Sql sql = new Sql(dataSource)
 
-
         if (hostName.contains("ellprd")){
-            instance = "ellprd"
+            instance = "ELLPRD"
         }
         else if (hostName.contains("elltrn")){
-            instance = "elltrn"
+            instance = "ELLTRN"
         }
         else if (hostName.contains("elltst")){
-            instance = "elltst"
+            instance = "ELLTST"
         }
         else {
-            instance = "elldev"
+            instance = "ELLDEV"
         }
 
         String queryMSF010 = "select table_desc as tableDesc from msf010 where table_type = '+MAX' and table_code = '$instance'"
@@ -75,10 +74,6 @@ class PurchaseOrderReceiptService_cancel extends ServiceHook{
 
                 purchaseOrderReceiptServiceResult.setPurchaseOrderReceiptDTO(purchaseOrderReceiptDTO)
             }
-//            log.info("---orderNumber2: ${purchaseOrderReceiptServiceResult.getPurchaseOrderReceiptDTO()}")
-//            log.info("---orderItemNumber2: ${purchaseOrderReceiptDTO.purchaseOrderItemNumber.getValue()}")
-//            log.info("---receiptRef2: ${purchaseOrderReceiptDTO.receiptReference.getValue()}")
-//            log.info("---receiptRefCancel2: ${purchaseOrderReceiptDTO.receiptReferenceCancel.getValue()}")
             log.info("---changeNumber2: ${purchaseOrderReceiptServiceResult.getPurchaseOrderReceiptDTO().changeNumber.getValue()}")
         }
         return null

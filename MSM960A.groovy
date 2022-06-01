@@ -25,18 +25,17 @@ class MSM960A extends MSOHook{
         Object dataSource = initialContext.lookup("java:jboss/datasources/ReadOnlyDatasource")
         Sql sql = new Sql(dataSource)
 
-
         if (hostName.contains("ellprd")){
-            instance = "ellprd"
+            instance = "ELLPRD"
         }
         else if (hostName.contains("elltrn")){
-            instance = "elltrn"
+            instance = "ELLTRN"
         }
         else if (hostName.contains("elltst")){
-            instance = "elltst"
+            instance = "ELLTST"
         }
         else {
-            instance = "elldev"
+            instance = "ELLDEV"
         }
 
         String queryMSF010 = "select table_desc as tableDesc from msf010 where table_type = '+MAX' and table_code = '$instance'"
@@ -78,7 +77,7 @@ class MSM960A extends MSOHook{
         String hostUrl = getHostUrl(hostname)
 
 //      mendefinisikan variable "postUrl" yang akan menampung url tujuan integrasi ke API Maximo
-        String postUrl = "$hostUrl/meaweb/es/EXTSYS1/MXE-COA-XML"
+        String postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-COA-XML"
 
 //        if (hostname.contains("ellprd"))
 //        {
