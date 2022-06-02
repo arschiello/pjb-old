@@ -1,15 +1,23 @@
+import com.abb.ellipse.nacacompiler.tools.Tools
+import com.abb.screen.meta.bean.component.Binding
+import com.mincom.ellipse.edoi.ejb.msf010.MSF010Key
+import com.mincom.ellipse.edoi.ejb.msf010.MSF010Rec
+import com.mincom.ellipse.hook.hooks.BaseHookTools
 import com.mincom.ellipse.hook.hooks.ServiceHook
+import com.mincom.ellipse.script.util.EDOIWrapper
 import com.mincom.ellipse.service.m3140.receiptdocument.ReceiptDocumentService
 import com.mincom.ellipse.types.m3140.instances.ReceiptDocumentDTO
 import com.mincom.ellipse.types.m3140.instances.ReceiptDocumentServiceResult
 import com.mincom.ellipse.types.m3140.instances.ReceiptPurchaseOrderItemDTO
 import com.mincom.enterpriseservice.ellipse.ErrorMessageDTO
 import com.mincom.enterpriseservice.exception.EnterpriseServiceOperationException
+import com.mincom.eql.impl.QueryImpl
 import groovy.sql.Sql
 import javax.naming.InitialContext
+import javax.sql.DataSource
 
 class ReceiptDocumentService_update extends ServiceHook{
-    String hookVersion = "2"
+    String hookVersion = "1"
 
     InitialContext initial = new InitialContext()
     Object CAISource = initial.lookup("java:jboss/datasources/ReadOnlyDatasource")
@@ -24,6 +32,10 @@ class ReceiptDocumentService_update extends ServiceHook{
     @Override
     Object onPostExecute(Object request, Object results){
         log.info("Arsiadi Hooks ReceiptDocumentService_update onPostExecute version: $hookVersion")
+        String active = checkIntegrationSwitch(tools.commarea.District)
+        if (active == "N"){
+            return null
+        }
         BigDecimal receiptVal = 0
         postUrl = "${hostUrl}/meaweb/es/EXTSYS1/MXE-ACTCOST-XML"
 
@@ -393,5 +405,14 @@ class ReceiptDocumentService_update extends ServiceHook{
         result = queryMSF010Result ? queryMSF010Result.tableDesc ? queryMSF010Result.tableDesc.trim(): "" : ""
 
         return result
+    }
+
+    String checkIntegrationSwitch(String districtCode){
+        QueryImpl query = new QueryImpl(MSF010Rec.class).and(MSF010Key.tableType.equalTo("+MIX")).and(MSF010Key.tableCode.equalTo("${districtCode}PORECEIPT"))
+        MSF010Rec msf010Rec = (MSF010Rec)edoi.firstRow(query)
+        if (MSF010Rec){
+            return msf010Rec.getActiveFlag()
+        }
+        return "N"
     }
 }

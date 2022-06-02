@@ -971,13 +971,28 @@ class PickTaskService_multipleIssueNonComplexStock extends ServiceHook{
 
         return result
     }
+    String checkIntegrationSwitch(String districtCode){
+        QueryImpl query = new QueryImpl(MSF010Rec.class).and(MSF010Key.tableType.equalTo("+MIX")).and(MSF010Key.tableCode.equalTo("${districtCode}IRISSUE"))
+        MSF010Rec msf010Rec = (MSF010Rec)edoi.firstRow(query)
+        if (MSF010Rec){
+            return msf010Rec.getActiveFlag()
+        }
+        return "N"
+    }
 
     @Override
     Object onPreExecute(Object input) {
         log.info("[ARSIADI] Hooks PickTaskService_multipleIssueNonComplexStock onPreExecute logging.version: $hookVersion")
 
         String pBCActiveFlag = getModuleSwitch("+PBC", "MSE1TP")
+        String active = checkIntegrationSwitch(tools.commarea.District)
+
         log.info("PBC Active Flag: $pBCActiveFlag")
+        log.info("active: $active")
+
+        if (active == "N"){
+            return null
+        }
         if (pBCActiveFlag != "" && pBCActiveFlag != "Y" || pBCActiveFlag == "") {
             return null
         }
